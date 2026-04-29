@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Attendance Prediction – ML Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f4f1eb;
+  --bg2: #ede9e0;
+  --ink: #0f1923;
+  --ink2: #2d3d50;
+  --muted: #7a8a99;
+  --accent: #1a6b5a;
+  --accent2: #e85d27;
+  --accent3: #2563b0;
+  --border: #d6cfc2;
+  --white: #ffffff;
+  --display: 'Syne', sans-serif;
+  --body: 'Instrument Sans', sans-serif;
+  --radius: 12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+nav{position:sticky;top:0;z-index:100;background:rgba(244,241,235,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:64px;}
+.nav-logo{font-family:var(--display);font-weight:800;font-size:1rem;letter-spacing:-.5px;color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:.82rem;font-weight:500;letter-spacing:.3px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:var(--ink);color:var(--bg) !important;padding:7px 18px;border-radius:6px;font-weight:600 !important;transition:background .2s !important;}
+.nav-cta:hover{background:var(--accent) !important;color:#fff !important;}
+.hero{min-height:calc(100vh - 64px);display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:80px 5vw;gap:60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(26,107,90,.07) 0%,transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(26,107,90,.1);color:var(--accent);border:1px solid rgba(26,107,90,.25);font-size:.75rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:20px;animation:fadeUp .6s ease both;}
+.hero h1{font-family:var(--display);font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-1.5px;color:var(--ink);animation:fadeUp .6s .1s ease both;margin-bottom:20px;}
+.hero h1 em{font-style:normal;color:var(--accent);position:relative;}
+.hero h1 em::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:3px;background:var(--accent2);border-radius:2px;transform:scaleX(0);transform-origin:left;animation:underlineIn .6s .8s ease forwards;}
+@keyframes underlineIn{to{transform:scaleX(1);}}
+.hero-desc{font-size:1.05rem;color:var(--ink2);line-height:1.75;animation:fadeUp .6s .2s ease both;margin-bottom:36px;max-width:520px;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;animation:fadeUp .6s .3s ease both;}
+.btn-primary{background:var(--accent);color:#fff;padding:13px 28px;border-radius:8px;font-weight:600;font-size:.92rem;text-decoration:none;transition:background .2s,transform .2s;display:inline-block;}
+.btn-primary:hover{background:#135246;transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--ink);padding:13px 28px;border-radius:8px;font-weight:500;font-size:.92rem;text-decoration:none;border:1.5px solid var(--border);transition:border-color .2s,transform .2s;display:inline-block;}
+.btn-secondary:hover{border-color:var(--ink);transform:translateY(-1px);}
+.hero-right{display:grid;grid-template-columns:1fr 1fr;gap:16px;animation:fadeUp .6s .2s ease both;}
+.hero-stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;transition:transform .25s,box-shadow .25s;}
+.hero-stat:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,25,35,.08);}
+.hero-stat-num{font-family:var(--display);font-size:2.4rem;font-weight:800;line-height:1;margin-bottom:6px;}
+.hero-stat-label{font-size:.8rem;color:var(--muted);font-weight:500;}
+.c-green{color:var(--accent);}
+.c-orange{color:var(--accent2);}
+.c-blue{color:var(--accent3);}
+section{padding:100px 5vw;}
+.section-tag{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.section-title{font-family:var(--display);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;letter-spacing:-1px;line-height:1.15;color:var(--ink);margin-bottom:16px;}
+.section-desc{font-size:1.05rem;color:var(--ink2);max-width:600px;line-height:1.75;margin-bottom:52px;}
+#about{background:var(--white);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
+.about-phases{display:flex;flex-direction:column;gap:16px;margin-top:8px;}
+.phase-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;display:flex;gap:18px;align-items:flex-start;transition:border-color .2s,transform .2s;}
+.phase-card:hover{border-color:var(--accent);transform:translateX(4px);}
+.phase-num{font-family:var(--display);font-weight:800;font-size:1.6rem;color:var(--border);line-height:1;flex-shrink:0;width:32px;}
+.phase-card:hover .phase-num{color:var(--accent);}
+.phase-title{font-weight:600;font-size:.95rem;margin-bottom:4px;color:var(--ink);}
+.phase-text{font-size:.84rem;color:var(--muted);line-height:1.6;}
+#tech{background:var(--bg2);}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;}
+.tech-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;transition:transform .22s,box-shadow .22s,border-color .22s;}
+.tech-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(15,25,35,.07);border-color:var(--accent);}
+.tech-icon{font-size:2rem;margin-bottom:12px;}
+.tech-name{font-weight:600;font-size:.9rem;color:var(--ink);}
+.tech-desc{font-size:.76rem;color:var(--muted);margin-top:4px;}
+#models{background:var(--white);}
+.models-layout{display:grid;grid-template-columns:1.1fr 0.9fr;gap:52px;align-items:start;}
+.model-list{display:flex;flex-direction:column;gap:12px;}
+.model-item{display:flex;align-items:center;gap:16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 18px;transition:border-color .2s,background .2s;}
+.model-item:hover{border-color:var(--accent2);background:#fef9f6;}
+.model-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);flex-shrink:0;}
+.model-name{font-weight:600;font-size:.9rem;color:var(--ink);}
+.model-meta{font-size:.76rem;color:var(--muted);margin-top:2px;}
+.metrics-box{background:var(--ink);border-radius:var(--radius);padding:32px;}
+.metrics-box h3{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--bg);margin-bottom:24px;letter-spacing:-.3px;}
+.metric-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.metric-row:last-child{margin-bottom:0;}
+.metric-name{font-size:.84rem;color:#94a3b8;min-width:80px;}
+.metric-bar-wrap{flex:1;margin:0 16px;height:4px;background:#1e2d3d;border-radius:2px;overflow:hidden;}
+.metric-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),#2dd4a8);}
+.metric-val{font-family:var(--display);font-size:.9rem;font-weight:700;color:#e2e8f0;}
+.result-callout{margin-top:28px;background:rgba(26,107,90,.12);border:1px solid rgba(26,107,90,.3);border-radius:8px;padding:18px;}
+.result-callout p{font-size:.84rem;color:var(--ink2);line-height:1.6;}
+.result-callout strong{color:var(--accent);}
+#clustering{background:var(--bg2);}
+.cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:44px;}
+.cluster-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:28px;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;}
+.cluster-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(15,25,35,.08);}
+.cluster-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.cluster-card.green::before{background:var(--accent);}
+.cluster-card.orange::before{background:var(--accent2);}
+.cluster-card.blue::before{background:var(--accent3);}
+.cluster-label{font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.cluster-card.green .cluster-label{color:var(--accent);}
+.cluster-card.orange .cluster-label{color:var(--accent2);}
+.cluster-card.blue .cluster-label{color:var(--accent3);}
+.cluster-card h3{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.cluster-card p{font-size:.85rem;color:var(--muted);line-height:1.65;}
+.pca-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
+.pca-box h3{font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:12px;}
+.pca-box p{font-size:.88rem;color:var(--ink2);line-height:1.75;margin-bottom:16px;}
+.pca-visual{background:var(--bg2);border-radius:10px;height:220px;position:relative;overflow:hidden;border:1px solid var(--border);}
+#insights{background:var(--white);}
+.insights-2col{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+.insight-list{display:flex;flex-direction:column;gap:14px;}
+.insight-item{display:flex;gap:16px;padding:16px 18px;background:var(--bg);border-radius:8px;border:1px solid var(--border);transition:border-color .2s;}
+.insight-item:hover{border-color:var(--accent3);}
+.insight-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.insight-text h4{font-weight:600;font-size:.92rem;color:var(--ink);margin-bottom:4px;}
+.insight-text p{font-size:.81rem;color:var(--muted);line-height:1.6;}
+.apps-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.app-card{background:var(--ink);border-radius:8px;padding:18px 20px;transition:background .2s;}
+.app-card:hover{background:var(--accent);}
+.app-card h4{font-weight:600;font-size:.88rem;color:var(--bg);margin-bottom:4px;}
+.app-card p{font-size:.77rem;color:#94a3b8;line-height:1.5;}
+.app-card:hover p{color:rgba(255,255,255,.75);}
+#future{background:var(--bg2);}
+.future-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
+.future-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px 22px;transition:transform .22s,box-shadow .22s,border-color .22s;}
+.future-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(15,25,35,.07);border-color:var(--accent3);}
+.future-card h3{font-family:var(--display);font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--ink);}
+.future-card p{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.future-num{font-family:var(--display);font-size:2rem;font-weight:800;color:var(--border);margin-bottom:12px;}
+#team{background:var(--white);}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}
+.team-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px 24px;text-align:center;transition:transform .25s,box-shadow .25s;}
+.team-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,25,35,.08);}
+.team-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:1.3rem;color:#fff;}
+.team-name{font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:4px;}
+.team-id{font-size:.78rem;color:var(--muted);}
+#conclusion{background:var(--ink);text-align:center;padding:120px 5vw;}
+#conclusion .section-tag{color:#4ade80;}
+#conclusion .section-title{color:#f4f1eb;}
+#conclusion .section-desc{color:#94a3b8;margin:0 auto 48px;}
+.conclusion-stats{display:flex;justify-content:center;gap:60px;flex-wrap:wrap;margin-bottom:52px;}
+.conc-stat{text-align:center;}
+.conc-num{font-family:var(--display);font-size:2.8rem;font-weight:800;line-height:1;margin-bottom:6px;}
+.conc-label{font-size:.78rem;color:#64748b;font-weight:500;}
+footer{background:#0a1018;padding:28px 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-top:1px solid #1e2d3d;}
+footer p{font-size:.78rem;color:#475569;}
+footer span{color:var(--accent);}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:auto;padding:60px 5vw;}
+  .hero-right{display:none;}
+  .about-grid,.models-layout,.insights-2col,.pca-box{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .hero h1{font-size:2rem;}
+  .apps-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ML_ATTEND</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="#clustering">Clustering</a></li>
+    <li><a href="#insights">Insights</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#conclusion" class="nav-cta">Conclusion</a></li>
+  </ul>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-tag">ML Project · Phase 3 Complete</div>
+    <h1>Student <em>Attendance</em> Prediction Using Machine Learning</h1>
+    <p class="hero-desc">A data-driven system that predicts student attendance patterns and groups students using advanced machine learning and clustering techniques.</p>
+    <div class="hero-btns">
+      <a href="#models" class="btn-primary">Explore Models</a>
+      <a href="#clustering" class="btn-secondary">View Clustering</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat"><div class="hero-stat-num c-green">93.2%</div><div class="hero-stat-label">Best Accuracy<br/>Random Forest</div></div>
+    <div class="hero-stat"><div class="hero-stat-num c-blue">0.91</div><div class="hero-stat-label">Best R² Score<br/>Regression</div></div>
+    <div class="hero-stat"><div class="hero-stat-num c-orange">3</div><div class="hero-stat-label">Student Clusters<br/>Identified</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" style="color:var(--ink)">12</div><div class="hero-stat-label">ML Models<br/>Trained &amp; Tested</div></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about-grid">
+    <div>
+      <p class="section-tag reveal">About the Project</p>
+      <h2 class="section-title reveal">A Complete ML Pipeline for Attendance Analysis</h2>
+      <p style="font-size:1.05rem;color:var(--ink2);line-height:1.75;" class="reveal">This project focuses on applying machine learning to analyze and predict student attendance using academic and behavioral attributes such as study hours, sleep patterns, and travel time. The system helps institutions proactively identify at-risk students and improve academic engagement.</p>
+    </div>
+    <div class="about-phases reveal">
+      <div class="phase-card">
+        <div class="phase-num">01</div>
+        <div><div class="phase-title">Data Preprocessing &amp; Cleaning</div><div class="phase-text">Removed irrelevant columns, encoded categorical variables, and applied StandardScaler feature scaling.</div></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">02</div>
+        <div><div class="phase-title">Regression &amp; Classification</div><div class="phase-text">Supervised models to predict attendance value and classify High vs Low attendance categories.</div></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">03</div>
+        <div><div class="phase-title">Clustering Analysis</div><div class="phase-text">Unsupervised grouping using K-Means, Hierarchical, and DBSCAN to find hidden student behavior patterns.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tech">
+  <p class="section-tag reveal">Technologies Used</p>
+  <h2 class="section-title reveal">Built With</h2>
+  <div class="tech-grid reveal">
+    <div class="tech-card"><div class="tech-icon">🐍</div><div class="tech-name">Python</div><div class="tech-desc">Core language</div></div>
+    <div class="tech-card"><div class="tech-icon">🐼</div><div class="tech-name">Pandas</div><div class="tech-desc">Data wrangling</div></div>
+    <div class="tech-card"><div class="tech-icon">🔢</div><div class="tech-name">NumPy</div><div class="tech-desc">Numerical ops</div></div>
+    <div class="tech-card"><div class="tech-icon">⚙️</div><div class="tech-name">Scikit-learn</div><div class="tech-desc">ML models</div></div>
+    <div class="tech-card"><div class="tech-icon">📊</div><div class="tech-name">Matplotlib</div><div class="tech-desc">Visualizations</div></div>
+    <div class="tech-card"><div class="tech-icon">☁️</div><div class="tech-name">Google Colab</div><div class="tech-desc">Runtime environment</div></div>
+  </div>
+</section>
+
+<section id="models">
+  <div class="models-layout">
+    <div>
+      <p class="section-tag reveal">Phase 2</p>
+      <h2 class="section-title reveal">Classification Models</h2>
+      <p class="section-desc reveal" style="margin-bottom:28px">We implemented six classification algorithms to predict whether a student will have high or low attendance, evaluated with 5-fold cross-validation.</p>
+      <div class="model-list reveal">
+        <div class="model-item"><div class="model-dot"></div><div><div class="model-name">Logistic Regression</div><div class="model-meta">Accuracy: 82.1% · F1: 0.815</div></div></div>
+        <div class="model-item"><div class="model-dot"></div><div><div class="model-name">K-Nearest Neighbors (KNN)</div><div class="model-meta">Accuracy: 85.4% · F1: 0.850</div></div></div>
+        <div class="model-item"><div class="model-dot"></div><div><div class="model-name">Decision Tree</div><div class="model-meta">Accuracy: 88.0% · F1: 0.875</div></div></div>
+        <div class="model-item"><div class="model-dot"></div><div><div class="model-name">Support Vector Machine (SVM)</div><div class="model-meta">Accuracy: 87.5% · F1: 0.875</div></div></div>
+        <div class="model-item"><div class="model-dot"></div><div><div class="model-name">Naïve Bayes</div><div class="model-meta">Accuracy: 92.1% · F1: 0.931 ★</div></div></div>
+        <div class="model-item" style="border-color:var(--accent)"><div class="model-dot" style="background:var(--accent)"></div><div><div class="model-name" style="color:var(--accent)">Random Forest 🏆</div><div class="model-meta">Accuracy: 93.2% · F1: 0.930 — Best</div></div></div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="metrics-box">
+        <h3>Random Forest — Top Model</h3>
+        <div class="metric-row"><span class="metric-name">Accuracy</span><div class="metric-bar-wrap"><div class="metric-bar" style="width:93.2%"></div></div><span class="metric-val">93.2%</span></div>
+        <div class="metric-row"><span class="metric-name">Precision</span><div class="metric-bar-wrap"><div class="metric-bar" style="width:94%"></div></div><span class="metric-val">0.94</span></div>
+        <div class="metric-row"><span class="metric-name">Recall</span><div class="metric-bar-wrap"><div class="metric-bar" style="width:93%"></div></div><span class="metric-val">0.93</span></div>
+        <div class="metric-row"><span class="metric-name">F1 Score</span><div class="metric-bar-wrap"><div class="metric-bar" style="width:93%"></div></div><span class="metric-val">0.930</span></div>
+        <div class="metric-row"><span class="metric-name">CV Acc.</span><div class="metric-bar-wrap"><div class="metric-bar" style="width:92.5%"></div></div><span class="metric-val">92.5%</span></div>
+      </div>
+      <div class="result-callout">
+        <p><strong>Key Outcome:</strong> Random Forest and Naïve Bayes both achieved ~92–93% accuracy, demonstrating strong predictive performance on student attendance data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="clustering">
+  <p class="section-tag reveal">Phase 3 — Unsupervised Learning</p>
+  <h2 class="section-title reveal">Clustering Analysis</h2>
+  <p class="section-desc reveal">Clustering grouped students by behavioral similarity without using attendance labels, revealing hidden student segments.</p>
+  <div class="cluster-grid">
+    <div class="cluster-card green reveal"><div class="cluster-label">K-Means Clustering</div><h3>Structured Grouping</h3><p>n_clusters = 3. Groups students into 3 balanced segments based on feature similarity. Clean, structured cluster distribution.</p></div>
+    <div class="cluster-card orange reveal"><div class="cluster-label">Hierarchical (Agglomerative)</div><h3>Nested Merging</h3><p>Builds clusters step by step by merging similar data points. Produces a dendrogram tree. Uneven but valid distribution.</p></div>
+    <div class="cluster-card blue reveal"><div class="cluster-label">DBSCAN</div><h3>Density-Based Detection</h3><p>eps = 1.5, min_samples = 5. Detects dense clusters and labels irregular outlier students as noise (label -1).</p></div>
+  </div>
+  <div class="pca-box reveal">
+    <div>
+      <h3>PCA Visualization</h3>
+      <p>Principal Component Analysis reduced the high-dimensional feature space to 2 components — enabling clear visual separation of student clusters.</p>
+      <ul style="padding-left:18px;font-size:.86rem;color:var(--muted);line-height:2.2;">
+        <li><strong style="color:var(--accent)">Cluster 0</strong> — High-effort students</li>
+        <li><strong style="color:var(--accent2)">Cluster 1</strong> — Moderate students</li>
+        <li><strong style="color:var(--accent3)">Cluster 2</strong> — At-risk students</li>
+        <li><strong style="color:var(--muted)">Noise</strong> — Outlier points (DBSCAN)</li>
+      </ul>
+    </div>
+    <div class="pca-visual" id="pcaCanvas"></div>
+  </div>
+</section>
+
+<section id="insights">
+  <p class="section-tag reveal">Results &amp; Applications</p>
+  <h2 class="section-title reveal">Key Insights &amp; Use Cases</h2>
+  <div class="insights-2col">
+    <div class="insight-list reveal">
+      <div class="insight-item"><div class="insight-icon">🔍</div><div class="insight-text"><h4>Distinct Behavioral Clusters</h4><p>Students cluster into high-effort, moderate, and at-risk segments based on behavioral and academic patterns.</p></div></div>
+      <div class="insight-item"><div class="insight-icon">📚</div><div class="insight-text"><h4>Study Hours &amp; Sleep Drive Attendance</h4><p>Study hours and sleep patterns are the strongest predictors of student attendance behavior.</p></div></div>
+      <div class="insight-item"><div class="insight-icon">🤖</div><div class="insight-text"><h4>ML Predicts Effectively</h4><p>Random Forest achieved 93.2% accuracy — demonstrating that ML models can reliably predict attendance patterns.</p></div></div>
+      <div class="insight-item"><div class="insight-icon">🧩</div><div class="insight-text"><h4>Hidden Trends via Clustering</h4><p>Clustering reveals hidden student behavior trends that supervised models alone cannot uncover.</p></div></div>
+    </div>
+    <div>
+      <h3 style="font-family:var(--display);font-weight:700;margin-bottom:18px;font-size:1.2rem;" class="reveal">Applications</h3>
+      <div class="apps-grid reveal">
+        <div class="app-card"><h4>Early Identification</h4><p>Detect low-attendance students before dropout risk escalates.</p></div>
+        <div class="app-card"><h4>Personalized Support</h4><p>Tailor academic interventions to individual student clusters.</p></div>
+        <div class="app-card"><h4>Institutional Decisions</h4><p>Data-driven policy-making for attendance improvement.</p></div>
+        <div class="app-card"><h4>Performance Monitoring</h4><p>Track student progress and engagement over time.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="future">
+  <p class="section-tag reveal">What's Next</p>
+  <h2 class="section-title reveal">Future Enhancements</h2>
+  <div class="future-grid">
+    <div class="future-card reveal"><div class="future-num">01</div><h3>Real-Time Prediction</h3><p>Deploy a live attendance prediction system that processes student data in real-time.</p></div>
+    <div class="future-card reveal"><div class="future-num">02</div><h3>ERP Integration</h3><p>Integrate with college ERP systems for seamless data flow and automated alerting.</p></div>
+    <div class="future-card reveal"><div class="future-num">03</div><h3>Deep Learning Models</h3><p>Apply neural network architectures for improved accuracy on complex behavioral patterns.</p></div>
+    <div class="future-card reveal"><div class="future-num">04</div><h3>Monitoring Dashboard</h3><p>Build an interactive faculty dashboard to visualize and monitor student data live.</p></div>
+  </div>
+</section>
+
+<section id="team">
+  <p class="section-tag reveal">The Team</p>
+  <h2 class="section-title reveal">Project Members</h2>
+  <div class="team-grid reveal">
+    <div class="team-card"><div class="team-avatar">BJ</div><div class="team-name">B. Jai Prithvi</div><div class="team-id">24BIT043</div></div>
+    <div class="team-card"><div class="team-avatar">HS</div><div class="team-name">Hariharan S</div><div class="team-id">24BIT037</div></div>
+    <div class="team-card"><div class="team-avatar">HP</div><div class="team-name">Hari Prasath M S</div><div class="team-id">24BIT039</div></div>
+  </div>
+</section>
+
+<section id="conclusion">
+  <p class="section-tag">Conclusion</p>
+  <h2 class="section-title">A Complete Analytical System</h2>
+  <p class="section-desc">This project demonstrates the effectiveness of machine learning in solving real-world educational problems. By combining classification and clustering, it provides both predictive and analytical insights into student attendance behavior.</p>
+  <div class="conclusion-stats">
+    <div class="conc-stat"><div class="conc-num c-green">93.2%</div><div class="conc-label">Peak Accuracy</div></div>
+    <div class="conc-stat"><div class="conc-num" style="color:#a78bfa">3</div><div class="conc-label">Clustering Methods</div></div>
+    <div class="conc-stat"><div class="conc-num c-orange">6</div><div class="conc-label">Classifiers Compared</div></div>
+    <div class="conc-stat"><div class="conc-num" style="color:#f4f1eb">12</div><div class="conc-label">Models Trained</div></div>
+  </div>
+  <a href="#home" class="btn-primary">↑ Back to Top</a>
+</section>
+
+<footer>
+  <p>© 2024 <span>ML Attendance System</span> · 24BIT037, 24BIT039, 24BIT043</p>
+  <p>Built with Python · Scikit-learn · Matplotlib</p>
+</footer>
+
+<script>
+const revealEls = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => {
+    if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('visible'),i*60); obs.unobserve(e.target); }
+  });
+}, {threshold:0.1});
+revealEls.forEach(el=>obs.observe(el));
+
+// PCA animated scatter
+const pcaWrap = document.getElementById('pcaCanvas');
+const canvas = document.createElement('canvas');
+canvas.style.width='100%'; canvas.style.height='100%';
+pcaWrap.appendChild(canvas);
+function resize(){canvas.width=pcaWrap.offsetWidth;canvas.height=pcaWrap.offsetHeight;}
+resize();
+window.addEventListener('resize',resize);
+const ctx = canvas.getContext('2d');
+const clusterDefs=[
+  {cx:.25,cy:.35,n:32,col:'#1a6b5a',spread:0.18},
+  {cx:.68,cy:.42,n:36,col:'#e85d27',spread:0.2},
+  {cx:.45,cy:.72,n:20,col:'#2563b0',spread:0.15},
+  {cx:.5, cy:.5, n:8, col:'#94a3b8',spread:0.45}
+];
+const pts=[];
+clusterDefs.forEach(c=>{
+  for(let i=0;i<c.n;i++){
+    pts.push({
+      bx:c.cx+(Math.random()-.5)*c.spread,
+      by:c.cy+(Math.random()-.5)*c.spread,
+      vx:(Math.random()-.5)*.0008,
+      vy:(Math.random()-.5)*.0008,
+      ox:0,oy:0,
+      col:c.col,r:c===clusterDefs[3]?3:5
+    });
+  }
+});
+pts.forEach(p=>{p.ox=p.bx;p.oy=p.by;});
+function draw(){
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  pts.forEach(p=>{
+    p.bx+=p.vx; p.by+=p.vy;
+    if(Math.abs(p.bx-p.ox)>.06)p.vx*=-1;
+    if(Math.abs(p.by-p.oy)>.06)p.vy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.bx*w,p.by*h,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.col+'cc';
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
